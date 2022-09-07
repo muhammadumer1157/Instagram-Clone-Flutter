@@ -35,9 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     String res = await AuthMethods().loginUser(
         email: _emailController.text, password: _passwordController.text);
-    setState(() {
-      _isLoading = false;
-    });
+
     if (res == "Success") {
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -50,6 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
       // ignore: use_build_context_synchronously
       showSnackBar(res, context);
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void navigateToSignUp() {
