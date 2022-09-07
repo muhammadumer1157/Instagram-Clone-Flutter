@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       title: "Instagram Clone",
       theme: ThemeData.dark()
           .copyWith(scaffoldBackgroundColor: mobileBackgroundColor),
-      home: const SignupScreen(),
+      home: const LoginScreen(),
       // home: const ResponsiveLayout(
       //     webScreenLayout: WebScreenLayout(),
       //     mobileScreenLayout: MobileScreenLayout()),

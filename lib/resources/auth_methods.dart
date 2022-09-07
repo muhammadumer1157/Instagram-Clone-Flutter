@@ -17,10 +17,10 @@ class AuthMethods {
       required Uint8List file}) async {
     String res = "Some error occured";
     try {
-      if (email.isNotEmpty ||
-          password.isNotEmpty ||
-          username.isNotEmpty ||
-          bio.isNotEmpty ||
+      if (email.isNotEmpty &&
+          password.isNotEmpty &&
+          username.isNotEmpty &&
+          bio.isNotEmpty &&
           file != null) {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
@@ -40,6 +40,8 @@ class AuthMethods {
           'PhotoUrl': photoUrl
         });
         res = "Success";
+      } else {
+        res = "Please enter all fields";
       }
     } on FirebaseAuthException catch (err) {
       if (err.code == 'invalid-email') {
@@ -48,6 +50,31 @@ class AuthMethods {
         res = "Password should be atleast 6 characters";
       } else if (err.code == 'email-already-in-use') {
         res = "The account already exists for that email";
+      }
+    } catch (error) {
+      res = error.toString();
+    }
+    return res;
+  }
+
+  Future<String> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    String res = "Some error occured";
+    try {
+      if (email.isNotEmpty && password.isNotEmpty) {
+        await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
+        res = "Success";
+      } else {
+        res = "Please enter all fields";
+      }
+    } on FirebaseAuthException catch (err) {
+      if (err.code == 'user-not-found') {
+        res = "No user found for that email";
+      } else if (err.code == 'wrong-password') {
+        res = "Wrong password provided for that user";
       }
     } catch (error) {
       res = error.toString();
