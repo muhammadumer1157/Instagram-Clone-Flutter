@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/resources/firestore_methods.dart';
+import 'package:instagram_clone/screens/comments_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
@@ -62,7 +63,12 @@ class _PostCardState extends State<PostCard> {
                                   shrinkWrap: true,
                                   children: ['Delete']
                                       .map((e) => InkWell(
-                                            onTap: () {},
+                                            onTap: () async {
+                                              await FirestoreMethods()
+                                                  .deletePost(
+                                                      widget.snap['PostId']);
+                                              Navigator.of(context).pop();
+                                            },
                                             child: Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -139,7 +145,14 @@ class _PostCardState extends State<PostCard> {
                 ),
               ),
               IconButton(
-                  onPressed: () {}, icon: const Icon(Icons.comment_outlined)),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CommentsScreen(
+                        snap: widget.snap,
+                      ),
+                    ));
+                  },
+                  icon: const Icon(Icons.comment_outlined)),
               IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
               Expanded(
                   child: Align(
@@ -181,7 +194,11 @@ class _PostCardState extends State<PostCard> {
                       ])),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            CommentsScreen(snap: widget.snap)));
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: const Text(
