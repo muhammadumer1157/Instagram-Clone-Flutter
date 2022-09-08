@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class PostCard extends StatelessWidget {
+import '../models/user.dart';
+import '../providers/user_provider.dart';
+
+class PostCard extends StatefulWidget {
   final snap;
+
   const PostCard({Key? key, required this.snap}) : super(key: key);
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  bool isLikeAnimating = false;
+  @override
   Widget build(BuildContext context) {
+    final User user = Provider.of<UserProvider>(context).getUser;
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -20,7 +34,7 @@ class PostCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundImage: NetworkImage(snap['ProfImage']),
+                  backgroundImage: NetworkImage(widget.snap['ProfImage']),
                 ),
                 Expanded(
                   child: Padding(
@@ -30,7 +44,7 @@ class PostCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          snap['Username'],
+                          widget.snap['Username'],
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         )
                       ],
@@ -65,22 +79,65 @@ class PostCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: double.infinity,
-            child: Image.network(
-              snap['PostUrl'],
-              fit: BoxFit.cover,
+          GestureDetector(
+            onDoubleTap: () async {
+              await FirestoreMethods().likePost(
+                  widget.snap['PostId'], user.uid, widget.snap['Likes']);
+              setState(() {
+                isLikeAnimating = true;
+              });
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  width: double.infinity,
+                  child: Image.network(
+                    widget.snap['PostUrl'],
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 100),
+                  opacity: isLikeAnimating ? 1 : 0,
+                  child: LikeAnimation(
+                    isAnimating: isLikeAnimating,
+                    duration: const Duration(milliseconds: 400),
+                    onEnd: () {
+                      Future.delayed(Duration.zero, () {
+                        setState(() {
+                          isLikeAnimating = false;
+                        });
+                      });
+                    },
+                    child: const Icon(Icons.favorite,
+                        color: Colors.white, size: 100),
+                  ),
+                )
+              ],
             ),
           ),
           Row(
             children: [
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.favorite,
-                    color: Colors.red,
-                  )),
+              LikeAnimation(
+                isAnimating: widget.snap['Likes'].contains(user.uid),
+                smallLike: true,
+                child: IconButton(
+                  onPressed: () async {
+                    await FirestoreMethods().likePost(
+                        widget.snap['PostId'], user.uid, widget.snap['Likes']);
+                  },
+                  icon: widget.snap['Likes'].contains(user.uid)
+                      ? const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                        )
+                      : const Icon(
+                          Icons.favorite_border,
+                        ),
+                ),
+              ),
               IconButton(
                   onPressed: () {}, icon: const Icon(Icons.comment_outlined)),
               IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
@@ -106,7 +163,7 @@ class PostCard extends StatelessWidget {
                       .subtitle2!
                       .copyWith(fontWeight: FontWeight.w800),
                   child: Text(
-                    '${snap['Likes'].length} likes',
+                    '${widget.snap['Likes'].length} likes',
                     style: Theme.of(context).textTheme.bodyText2,
                   ),
                 ),
@@ -119,8 +176,8 @@ class PostCard extends StatelessWidget {
                           children: [
                         TextSpan(
                             style: const TextStyle(fontWeight: FontWeight.bold),
-                            text: snap['Username']),
-                        TextSpan(text: ' ${snap['Description']}')
+                            text: widget.snap['Username']),
+                        TextSpan(text: ' ${widget.snap['Description']}')
                       ])),
                 ),
                 InkWell(
@@ -136,7 +193,8 @@ class PostCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Text(
-                    DateFormat.yMMMd().format(snap['DatePublished'].toDate()),
+                    DateFormat.yMMMd()
+                        .format(widget.snap['DatePublished'].toDate()),
                     style:
                         const TextStyle(fontSize: 16.0, color: secondaryColor),
                   ),
