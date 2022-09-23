@@ -6,7 +6,6 @@ import 'package:instagram_clone/utils/dimensions.dart';
 import 'package:instagram_clone/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../models/user.dart';
 import '../providers/user_provider.dart';
 
