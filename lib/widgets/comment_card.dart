@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -32,19 +30,19 @@ class _CommentCardState extends State<CommentCard> {
                   text: TextSpan(children: [
                     TextSpan(
                         text: widget.snap['Name'],
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                     TextSpan(
                       text: ' ${widget.snap['Text']}',
                     ),
                   ]),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 4.0),
+                  padding: const EdgeInsets.only(top: 4.0),
                   child: Text(
                     DateFormat.yMMMd()
                         .format(widget.snap['DatePublished'].toDate()),
-                    style:
-                        TextStyle(fontSize: 12.0, fontWeight: FontWeight.w400),
+                    style: const TextStyle(
+                        fontSize: 12.0, fontWeight: FontWeight.w400),
                   ),
                 ),
               ],
@@ -53,7 +51,7 @@ class _CommentCardState extends State<CommentCard> {
         ),
         Container(
           padding: const EdgeInsets.all(8.0),
-          child: Icon(
+          child: const Icon(
             Icons.favorite,
             size: 16,
           ),
